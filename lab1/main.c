@@ -1,0 +1,123 @@
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
+int main()
+{ 
+    FILE* counterbin;
+    int read_temp[5];
+    int write_temp[1] = {1};
+    if(!(counterbin = fopen("counter.bin", "rb+"))){
+        counterbin = fopen("counter.bin", "wb+");
+        fwrite(write_temp, sizeof(int), 1, counterbin);
+    }else{
+        fseek(counterbin, 0, SEEK_SET);
+        fread(read_temp, sizeof(int), 1, counterbin);
+        write_temp[0] = read_temp[0] + 1;
+        fseek(counterbin, 0, SEEK_SET);
+        fwrite(write_temp, sizeof(int), 1, counterbin);
+    }
+    fseek(counterbin, 0, SEEK_SET);
+    fread(read_temp, sizeof(int), 1, counterbin);
+    fclose(counterbin);
+    
+    
+    printf("歡迎光臨長庚樂透彩購機台");
+    printf("請輸入操作人員ID:(1~5)");
+    int op;
+    scanf("%d", &op);
+    while(op < 1 || op > 5){
+        printf("請重新輸入操作人員(1~5)");
+        scanf("%d", &op);
+    }
+    FILE* operatorbin;
+    int opread[5];
+    int opwrite[5];
+    
+    opwrite[0] = op;
+    if(!(operatorbin = fopen("operator_id.bin", "ab+"))){
+        operatorbin = fopen("operator_id.bin", "wb+");
+        fwrite(opwrite, sizeof(int), 1, operatorbin);
+    }else{
+        fwrite(opwrite, sizeof(int), 1, operatorbin);
+        fseek(operatorbin, 0, SEEK_CUR);
+        fread( opread, sizeof(int), 1, operatorbin);
+    }
+    fclose(operatorbin);
+    
+    
+    
+    int n;
+    printf("請問您要購買幾組樂透彩(1~5)");
+    scanf("%d", &n);
+    while(n > 5 || n < 1){
+        printf("格式不符，請重新輸入(1 <= N <= 5)");
+        scanf("%d", &n);
+    }
+    FILE* lotto;
+    FILE* counter;
+    char No[50];
+    No[0]= read_temp[0]+'0';
+    char FH[50]="lotto[";
+    sprintf(No, "%.5d", read_temp[0]);
+    strcat(FH, No);
+    strcat(FH, "].txt");
+    lotto = fopen(FH ,"w+");
+    time_t cur;
+    time(&cur);
+    srand((unsigned)time(NULL));
+    fprintf(lotto, "========= %s =========\n", "lotto649");
+    fprintf(lotto, "========+ No.%.5d +========\n", read_temp[0]);
+    fprintf(lotto, "= %.24s =\n", ctime(&cur));
+    for(int t = 1; t <= n; t++){
+        
+        int LN[7];
+        for(int i = 0; i < 6; i++){
+            int temp = rand() % 70;
+            while(findA(LN, temp) != -1){
+                temp = rand() % 70;
+            }
+            LN[i] = temp;
+        }
+        int temp;
+        temp = rand() % 10 +1;
+        while(findA(LN, temp) != -1)
+            temp = rand() % 10 +1;
+        LN[6] = temp;
+        fprintf(lotto, " [%d]: ", t);
+        for(int i = 0; i < 7; i++)
+            fprintf(lotto, "%.2d ", LN[i]);
+        fprintf(lotto, " \n");
+        if(t == n){
+            for(int ii = t+1; ii <=5; ii++){
+                fprintf(lotto, " [%d]: ", ii);
+                fprintf(lotto, "-- -- -- -- -- -- --  \n");
+            }
+        }
+    }
+    fprintf(lotto, "========* Op.%.5d *========\n", op);
+    fprintf(lotto, "========= %s =========", "csie@CGU");
+    fclose(lotto);
+    
+    FILE* testbin;
+    testbin = fopen("test.bin", "wb+");
+    int write[5] = {1, 2, 3, 4, 5};
+    int read[5];
+    fwrite(write, sizeof(int), 5, testbin);
+    fseek(testbin, 0, SEEK_SET);
+    fread(read, sizeof(int), 5, testbin);
+    fclose(testbin);
+    printf("已為您購買的 %d 組樂透組合輸出至 %s", n, FH);
+    return 0;
+}
+int findA(int arr[], int tar){
+    int len = 7;
+    int index = -1;
+    for(int i = 0; i < len; i++){
+        if(arr[i] == tar){
+            index = i;
+            break;
+        }
+    }
+    return index;
+}
