@@ -31,8 +31,8 @@ int main()
         scanf("%d", &op);
     }
     FILE* operatorbin;
-    int opread[5];
-    int opwrite[5];
+    int opread[1];
+    int opwrite[1];
     
     opwrite[0] = op;
     if(!(operatorbin = fopen("operator_id.bin", "ab+"))){
@@ -40,11 +40,10 @@ int main()
         fwrite(opwrite, sizeof(int), 1, operatorbin);
     }else{
         fwrite(opwrite, sizeof(int), 1, operatorbin);
-        fseek(operatorbin, 0, SEEK_CUR);
+        fseek(operatorbin, (read_temp[0]-1)*4, SEEK_SET);
         fread( opread, sizeof(int), 1, operatorbin);
     }
     fclose(operatorbin);
-    
     
     
     int n;
@@ -95,7 +94,7 @@ int main()
             }
         }
     }
-    fprintf(lotto, "========* Op.%.5d *========\n", op);
+    fprintf(lotto, "========* Op.%.5d *========\n", opread[0]);
     fprintf(lotto, "========= %s =========", "csie@CGU");
     fclose(lotto);
     
