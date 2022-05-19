@@ -1,61 +1,45 @@
+
 #include <stdio.h>
-
-typedef struct node{
-    int a;
-    struct node_t *next;
-}node_t;
-
-node_t* allocate_node(int data){
-    node_t* t = calloc(1, sizeof(node_t));
-    t->a = data;
-    return t;
+int do_before_adding(int* i){
+    *i =*i + 1;
+    return *i - 1;
 }
-
-void show_list(node_t* list){
-    node_t* temp = list;
-    printf("[%d]->", temp->a);
-    while(temp->next != NULL){
-        temp = temp->next;
-        printf("[%d]->", temp->a);
-    }
-    printf("%s\n", "null");
+int do_after_adding(int* i){
+    *i +=  1;
+    return *i; 
 }
-
-node_t* append_node(node_t* list, int new_data){
-    if(list == NULL){
-        list = allocate_node(new_data);
-    }else{
-        node_t* temp = list;
-        while(temp->next != NULL){
-            temp = temp->next;
-        }
-        temp->next = allocate_node(new_data);
-        }
-    return list;
-}
-
-void free_all_node(node_t* list){
-
-    printf("free([%d])->", list->a);
-    if(list->next != NULL)
-        free_all_node(list->next);
+void check_result(int x, int z, int t_x,int t_z){
+    if(x ==t_x && z == t_z)
+        printf(" pass\n");
     else
-        printf("null");
-    free(list);
+        printf(" fail\n");
+}
+void test_do_before_adding(){
+    int x = 1;
+    int z = 5 + do_before_adding(&x);
+    int t_x = 1;
+    int t_z = 5 + t_x++;
+    printf("do_before_adding()\n");
+    printf(" z=%d, x=%d, ", z, x);
+    printf(" t_z=%d, t_x=%d\n", t_z, t_x);
+    check_result(x, z, t_x, t_z);
+}
+void test_do_after_adding(){
+    int x = 1;
+    int z = 5 + do_after_adding(&x);
+    int t_x = 1;
+    int t_z = 5 + ++t_x;
+    printf("do_after_adding()\n");
+    printf(" z=%d, x=%d, ", z, x);
+    printf(" t_z=%d, t_x=%d\n", t_z, t_x);
+    check_result(x, z, t_x, t_z);
 }
 
 int main()
 {
-    node_t* head = NULL;
-    head = append_node(head, 0);
-    show_list(head);
-    head = append_node(head, 11);
-    show_list(head);
-    head = append_node(head, 222);
-    show_list(head);
-    head = append_node(head, 3333);
-    show_list(head);
-    free_all_node(head);
-
+    printf(" --- fun 1. --- ");
+    test_do_before_adding();
+    printf(" --- fun 2. --- ");
+    test_do_after_adding();
     return 0;
 }
